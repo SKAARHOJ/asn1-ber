@@ -401,6 +401,9 @@ func readPacket(reader io.Reader) (*Packet, int, error) {
 		case TagExternal:
 		case TagRealFloat:
 			p.Value, err = ParseReal(content)
+			if err != nil {
+				fmt.Println(err)
+			}
 		case TagEnumerated:
 			p.Value, _ = ParseInt64(content)
 		case TagEmbeddedPDV:
@@ -644,6 +647,31 @@ func NewReal(classType Class, tagType Type, tag Tag, value interface{}, descript
 	return p
 }
 
+func NewEmberReal(classType Class, tagType Type, tag Tag, value interface{}, description string) *Packet {
+	p := Encode(classType, tagType, tag, nil, description)
+
+	buff := bytes.NewBuffer([]byte{})
+	switch v := value.(type) {
+	case float64:
+		err := writeReal(buff, v)
+		if err != nil {
+			fmt.Printf("failed writing real %v", err)
+			return nil
+		}
+		p.Data.Write(buff.Bytes())
+	case float32:
+		err := writeReal(buff, float64(v))
+		if err != nil {
+			fmt.Printf("failed writing real %v", err)
+			return nil
+		}
+		p.Data.Write(buff.Bytes())
+	default:
+		panic(fmt.Sprintf("Invalid type %T, expected float{64|32}", v))
+	}
+	return p
+}
+
 func NewOID(classType Class, tagType Type, tag Tag, value interface{}, description string) *Packet {
 	p := Encode(classType, tagType, tag, nil, description)
 
@@ -658,7 +686,7 @@ func NewOID(classType Class, tagType Type, tag Tag, value interface{}, descripti
 		p.Data.Write(encoded)
 		// TODO: support []int already ?
 	default:
-		panic(fmt.Sprintf("Invalid type %T, expected float{64|32}", v))
+		panic(fmt.Sprintf("Invalid type %T, expected string", v))
 	}
 	return p
 }
@@ -677,7 +705,7 @@ func NewRelativeOID(classType Class, tagType Type, tag Tag, value interface{}, d
 		p.Data.Write(encoded)
 		// TODO: support []int already ?
 	default:
-		panic(fmt.Sprintf("Invalid type %T, expected float{64|32}", v))
+		panic(fmt.Sprintf("Invalid type %T, expected string", v))
 	}
 	return p
 }

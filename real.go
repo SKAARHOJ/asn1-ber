@@ -133,7 +133,7 @@ func parseDecimalFloat(v []byte) (val float64, err error) {
 	case 0x02, 0x03: // NR form 2, 3
 		val, err = strconv.ParseFloat(strings.Replace(strings.TrimLeft(string(v[1:]), " "), ",", ".", -1), 64)
 	default:
-		err = errors.New("incorrect NR form")
+		err = fmt.Errorf("incorrect NR form %d", v[0]&0x3F)
 	}
 	if err != nil {
 		return 0.0, err
