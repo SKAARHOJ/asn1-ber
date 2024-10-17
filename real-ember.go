@@ -190,10 +190,10 @@ func writeReal(writeBuffer *bytes.Buffer, value float64) error {
 
 	bits := int64(math.Float64bits(value))
 
-	if bits == -0 {
-		writeBuffer.Write([]byte{0x43}) // 8.5.3 and 8.5.9
-		return nil
-	}
+	// if bits == -0 {
+	// 	writeBuffer.Write([]byte{0x43}) // 8.5.3 and 8.5.9
+	// 	return nil
+	// }
 
 	// 8.5.2
 	if bits == 0 {
