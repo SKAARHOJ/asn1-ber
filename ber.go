@@ -262,12 +262,12 @@ func encodeInteger(i int64) []byte {
 func int64Length(i int64) (numBytes int) {
 	numBytes = 1
 
-	for i > 127 {
+	for i > 255 {
 		numBytes++
 		i >>= 8
 	}
 
-	for i < -128 {
+	for i < -255 {
 		numBytes++
 		i >>= 8
 	}
@@ -550,7 +550,7 @@ func NewBoolean(classType Class, tagType Type, tag Tag, value bool, description 
 	intValue := int64(0)
 
 	if value {
-		intValue = 1
+		intValue = 0xFF
 	}
 
 	p := Encode(classType, tagType, tag, nil, description)
